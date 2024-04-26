@@ -2,7 +2,7 @@ const utils = require("../utils")
 const generatePricingCombinations = utils.generatePricingCombinations
 const toLower = utils.formatInput.formatToLower
 const models = require("../models")
-const { isObjectIdOrHexString } = require("mongoose")
+const { isValidObjectId } = require("mongoose")
 const Location = models.Location
 
 const createLocationController = async (req, res) => {
@@ -102,44 +102,11 @@ const updateLocationDetailsController = async (req, res) => {
 	}
 }
 
-// This is for pricing model
-// const updateLocationDetailsController = async (req, res) => {
-// 	try {
-// 		const { locationId } = req.params
-// 		const { interstatePrice, intrastatePrice } = req.body
-
-// 		if (!locationId || !isObjectIdOrHexString(locationId)) {
-// 			return res.status(400).json({ error: "Invalid location ID" })
-// 		}
-
-// 		const location = await Location.findById(locationId)
-
-// 		if (!location) {
-// 			return res.status(404).json({ error: "Location not found" })
-// 		}
-
-// 		if (interstatePrice !== undefined) {
-// 			location.interstatePrice = interstatePrice
-// 		}
-// 		if (intrastatePrice !== undefined) {
-// 			location.intrastatePrice = intrastatePrice
-// 		}
-
-// 		// Save the updated location details
-// 		await location.save()
-
-// 		return res.status(200).json({ location })
-// 	} catch (error) {
-// 		console.error("Error in updateLocationDetails controller:", error)
-// 		return res.status(500).json({ error: "Internal server error" })
-// 	}
-// }
-
 const deleteLocationController = async (req, res) => {
 	try {
 		const { locationId } = req.params
 
-		if (!locationId || !isObjectIdOrHexString(locationId)) {
+		if (!locationId || !isValidObjectId(locationId)) {
 			return res.status(400).json({ error: "Invalid location ID" })
 		}
 

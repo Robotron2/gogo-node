@@ -11,6 +11,7 @@ const routes = require("./src/routes")
 const authRoute = routes.authRoutes
 const driverAuthRoute = routes.driverAuthRoutes
 const locationRoute = routes.locationRoutes
+const pricingRoute = routes.pricingRoutes
 
 app.use(
 	cors({
@@ -26,6 +27,7 @@ app.use(cookieParser())
 app.use("/api/auth", authRoute)
 app.use("/api/auth/driver", driverAuthRoute)
 app.use("/api/location", locationRoute)
+app.use("/api/pricing", pricingRoute)
 
 app.get("/", (req, res) => {
 	res.status(200).json({
