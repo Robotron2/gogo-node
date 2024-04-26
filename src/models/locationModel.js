@@ -4,7 +4,6 @@ const locationSchema = mongoose.Schema({
 	name: {
 		type: String,
 		required: true,
-		unique: true,
 	},
 	zone: {
 		type: String,

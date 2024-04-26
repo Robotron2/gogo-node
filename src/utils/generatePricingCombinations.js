@@ -8,30 +8,35 @@ const generatePricingCombinations = async () => {
 		let count = 0
 
 		for (let i = 0; i < locations.length; i++) {
-			for (let j = 0; j < locations.length; j++) {
-				if (locations[i]._id.toString() !== locations[j]._id.toString()) {
-					const existingEntry = await Pricing.findOne({
+			for (let j = i + 1; j < locations.length; j++) {
+				const existingEntry1 = await Pricing.findOne({
+					pickupLocation: locations[i]._id,
+					dropoffLocation: locations[j]._id,
+				})
+
+				const existingEntry2 = await Pricing.findOne({
+					pickupLocation: locations[j]._id,
+					dropoffLocation: locations[i]._id,
+				})
+
+				if (!existingEntry1 && !existingEntry2) {
+					const newPricing = new Pricing({
 						pickupLocation: locations[i]._id,
 						dropoffLocation: locations[j]._id,
+						intrastatePrice: 0,
+						interstatePrice: 0,
 					})
-
-					if (!existingEntry) {
-						const newPricing = new Pricing({
-							pickupLocation: locations[i]._id,
-							dropoffLocation: locations[j]._id,
-							intrastatePrice: 0,
-							interstatePrice: 0,
-						})
-						await newPricing.save()
-						count++
-					}
+					await newPricing.save()
+					count++
 				}
 			}
 		}
 
 		console.log(`Generated ${count} new pricing combinations.`)
+		return true
 	} catch (error) {
 		console.error("Failed to generate pricing combinations:", error)
+		return false
 	}
 }
 

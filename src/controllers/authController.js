@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs")
 const utils = require("../utils")
 const generateToken = utils.generateToken
+const toLower = utils.formatInput.formatToLower
 const models = require("../models")
 const User = models.User
 
@@ -17,8 +18,8 @@ const registerController = async (req, res) => {
 		const hashedPassword = await bcrypt.hash(password, salt)
 
 		const newUser = new User({
-			fullname,
-			email,
+			fullname: toLower(fullname),
+			email: toLower(email),
 			password: hashedPassword,
 		})
 
@@ -40,7 +41,7 @@ const loginController = async (req, res) => {
 	try {
 		const { email, password } = req.body
 
-		const user = await User.findOne({ email })
+		const user = await User.findOne({ email: toLower(email) })
 
 		const isPasswordCorrect = await bcrypt.compare(password, user?.password || "")
 
