@@ -7,9 +7,8 @@ const { app, server } = require("./src/socket/socket")
 
 const port = process.env.PORT | 4000
 
-// const authRoute = require("./routes/authRoutes")
-// const messageRoute = require("./routes/messageRoutes")
-// const userRoute = require("./routes/userRoutes")
+const routes = require("./src/routes")
+const authRoute = routes.authRoutes
 
 app.use(
 	cors({
@@ -22,7 +21,7 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
-// app.use("/api/auth", authRoute)
+app.use("/api/auth", authRoute)
 // app.use("/api/messages", messageRoute)
 // app.use("/api/users", userRoute)
 
