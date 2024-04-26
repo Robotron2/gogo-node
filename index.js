@@ -9,6 +9,7 @@ const port = process.env.PORT | 4000
 
 const routes = require("./src/routes")
 const authRoute = routes.authRoutes
+const driverAuthRoute = routes.driverAuthRoutes
 
 app.use(
 	cors({
@@ -22,6 +23,7 @@ app.use(express.json())
 app.use(cookieParser())
 
 app.use("/api/auth", authRoute)
+app.use("/api/auth/driver", driverAuthRoute)
 // app.use("/api/messages", messageRoute)
 // app.use("/api/users", userRoute)
 

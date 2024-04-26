@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs")
-const generateToken = require("../utils/generateToken")
+const utils = require("../utils")
+const generateToken = utils.generateToken
 const models = require("../models")
 const User = models.User
 

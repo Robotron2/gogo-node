@@ -3,8 +3,8 @@ const router = express.Router()
 const controllers = require("../controllers")
 const driverAuthController = controllers.driverAuthController
 
-router.post("/driver/register", driverAuthController.registerDriver)
-router.post("/driver/login", driverAuthController.loginDriver)
-router.post("/driver/logout", driverAuthController.logoutDriver)
+router.post("/register", driverAuthController.registerDriver)
+router.post("/login", driverAuthController.loginDriver)
+router.post("/logout", driverAuthController.logoutDriver)
 
 module.exports = router
