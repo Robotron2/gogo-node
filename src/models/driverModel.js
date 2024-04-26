@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 
 const driverSchema = mongoose.Schema({
-	name: {
+	fullaname: {
 		type: String,
 		required: true,
 	},
@@ -18,15 +18,18 @@ const driverSchema = mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+	isAdmin: {
+		type: Boolean,
+		default: false,
+	},
+	isDriver: {
+		type: Boolean,
+		default: true,
+	},
 	status: {
 		type: String,
 		enum: ["active", "driving"],
 		default: "active",
-	},
-	car: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: "car",
-		required: true,
 	},
 })
 

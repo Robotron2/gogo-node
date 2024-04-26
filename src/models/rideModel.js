@@ -1,4 +1,5 @@
 const mongoose = require("mongoose")
+const Car = require("./carModel")
 
 const rideSchema = mongoose.Schema({
 	pickup: {
@@ -14,9 +15,9 @@ const rideSchema = mongoose.Schema({
 		ref: "user",
 		required: true,
 	},
-	driver: {
+	car: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: "driver",
+		ref: "car",
 		required: true,
 	},
 	paymentType: {
