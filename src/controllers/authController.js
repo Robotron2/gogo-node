@@ -30,6 +30,9 @@ const registerController = async (req, res) => {
 			id: newUser._id,
 			fullname: newUser.fullname,
 			email: newUser.email,
+			isAdmin: newUser.isAdmin,
+			isDriver: newUser.isDriver,
+			isSuspended: newUser.isSuspended,
 		})
 	} catch (error) {
 		console.log("Error in signup controller", error.message)
@@ -54,6 +57,9 @@ const loginController = async (req, res) => {
 			id: user._id,
 			fullname: user.fullname,
 			email: user.email,
+			isAdmin: user.isAdmin,
+			isDriver: user.isDriver,
+			isSuspended: user.isSuspended,
 		})
 	} catch (error) {
 		console.log("Error in login controller", error.message)

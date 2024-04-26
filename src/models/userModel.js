@@ -22,6 +22,10 @@ const userSchema = mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+	isSuspended: {
+		type: Boolean,
+		default: false,
+	},
 })
 
 const User = mongoose.model("user", userSchema)

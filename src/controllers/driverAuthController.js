@@ -29,6 +29,9 @@ const registerDriver = async (req, res) => {
 			id: newDriver._id,
 			fullname: newDriver.fullname,
 			email: newDriver.email,
+			isAdmin: newDriver.isAdmin,
+			isDriver: newDriver.isDriver,
+			isSuspended: newDriver.isSuspended,
 		})
 	} catch (error) {
 		console.log("Error in signup controller", error.message)
@@ -53,6 +56,9 @@ const loginDriver = async (req, res) => {
 			id: driver._id,
 			fullname: driver.fullname,
 			email: driver.email,
+			isAdmin: driver.isAdmin,
+			isDriver: driver.isDriver,
+			isSuspended: driver.isSuspended,
 		})
 	} catch (error) {
 		console.log("Error in login controller", error.message)

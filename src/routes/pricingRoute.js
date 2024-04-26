@@ -2,7 +2,9 @@ const express = require("express")
 const router = express.Router()
 const controllers = require("../controllers")
 const pricingController = controllers.pricingController
+const middlewares = require("../middlewares")
+const { protectRoute, isAdmin } = middlewares
 
-router.put("/update/:pricingId", pricingController.updateLocationPricingController)
+router.put("/update/:pricingId", protectRoute, isAdmin, pricingController.updateLocationPricingController)
 
 module.exports = router

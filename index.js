@@ -5,13 +5,14 @@ const cors = require("cors")
 const connectToDB = require("./src/config/db")
 const { app, server } = require("./src/socket/socket")
 
-const port = process.env.PORT | 4000
+const port = process.env.PORT || 4000
 
 const routes = require("./src/routes")
 const authRoute = routes.authRoutes
 const driverAuthRoute = routes.driverAuthRoutes
 const locationRoute = routes.locationRoutes
 const pricingRoute = routes.pricingRoutes
+const rideRoute = routes.rideRoutes
 
 app.use(
 	cors({
@@ -28,6 +29,7 @@ app.use("/api/auth", authRoute)
 app.use("/api/auth/driver", driverAuthRoute)
 app.use("/api/location", locationRoute)
 app.use("/api/pricing", pricingRoute)
+app.use("/api/ride", rideRoute)
 
 app.get("/", (req, res) => {
 	res.status(200).json({
