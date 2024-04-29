@@ -4,6 +4,7 @@ const locationModel = require("./locationModel")
 const pricingModel = require("./pricingModel")
 const rideModel = require("./rideModel")
 const userModel = require("./userModel")
+const stateModel = require("./statesModel")
 
 module.exports = {
 	Car: carModel,
@@ -12,4 +13,5 @@ module.exports = {
 	Pricing: pricingModel,
 	Ride: rideModel,
 	User: userModel,
+	State: stateModel,
 }

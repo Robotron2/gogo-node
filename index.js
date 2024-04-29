@@ -16,7 +16,7 @@ const rideRoute = routes.rideRoutes
 
 app.use(
 	cors({
-		origin: "http://localhost:5173",
+		origin: process.env.CLIENT_ORIGIN,
 		methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 		credentials: true,
 	})

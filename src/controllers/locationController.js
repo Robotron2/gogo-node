@@ -2,8 +2,9 @@ const utils = require("../utils")
 const generatePricingCombinations = utils.generatePricingCombinations
 const toLower = utils.formatInput.formatToLower
 const models = require("../models")
-const { isValidObjectId } = require("mongoose")
 const Location = models.Location
+const State = models.State
+const { isValidObjectId } = require("mongoose")
 
 const createLocationController = async (req, res) => {
 	try {
@@ -42,7 +43,47 @@ const createLocationController = async (req, res) => {
 	}
 }
 
-const getLocationsByZoneController = async (req, res) => {
+//Fetch all states by default, select your state and pass to the second controller i.e getZones by state
+
+const getStatesController = async (req, res) => {
+	try {
+		const states = await State.find({})
+
+		if (states.length === 0) {
+			return res.status(404).json({ error: "No state at the moment" })
+		}
+
+		return res.status(200).json({ states })
+	} catch (error) {
+		console.error("Error in getStatesController:", error)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
+//The state selected in the previous controller will be passed here to fetch all the zones in that state. the we move to the next controller
+const getZonesByStateController = async (req, res) => {
+	try {
+		const { state } = req.query
+
+		if (!state) {
+			return res.status(400).json({ error: "Provide the state" })
+		}
+
+		const zones = await Location.distinct("zone", { state: state.toLowerCase() })
+
+		if (zones.length === 0) {
+			return res.status(404).json({ error: "No zones found for the provided state" })
+		}
+
+		return res.status(200).json({ zones })
+	} catch (error) {
+		console.error("Error in getZonesByStateController:", error)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
+//Pick the nearest location name to you then we go to the next page to fill the dropoff location details.
+const getLocationsByZoneAndStateController = async (req, res) => {
 	try {
 		const { zone, state } = req.query
 
@@ -62,6 +103,27 @@ const getLocationsByZoneController = async (req, res) => {
 		return res.status(500).json({ error: "Internal server error" })
 	}
 }
+
+// const getLocationsByStateController = async (req, res) => {
+// 	try {
+// 		const { state } = req.query
+
+// 		if (!state) {
+// 			return res.status(400).json({ error: "Provide your pickup state" })
+// 		}
+
+// 		const locations = await Location.find({ state: toLower(state) })
+
+// 		if (locations.length === 0) {
+// 			return res.status(404).json({ error: "No locations found for the provided state" })
+// 		}
+
+// 		return res.status(200).json({ locations })
+// 	} catch (error) {
+// 		console.error("Error in getLocationsByStateController:", error)
+// 		return res.status(500).json({ error: "Internal server error" })
+// 	}
+// }
 
 // Might not be needed.
 const updateLocationDetailsController = async (req, res) => {
@@ -133,7 +195,10 @@ const deleteLocationController = async (req, res) => {
 
 module.exports = {
 	createLocationController,
-	getLocationsByZoneController,
+	getStatesController,
+	getZonesByStateController,
+	getLocationsByZoneAndStateController,
+	// getLocationsByStateController,
 	updateLocationDetailsController,
 	deleteLocationController,
 }

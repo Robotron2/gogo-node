@@ -1,8 +1,8 @@
 const models = require("../models")
-const User = models.User
 const Ride = models.Ride
+const Pricing = models.Pricing
 const bookRideController = async (req, res) => {
-	res.status(200).json({ success: true })
+	//
 }
 
 const getUserRidesController = async (req, res) => {
