@@ -39,10 +39,20 @@ const rideSchema = mongoose.Schema({
 		enum: [true, false],
 		default: false,
 	},
-	status: {
+	paymentStatus: {
 		type: String,
 		enum: ["paid", "pending"],
 		default: "pending",
+	},
+	rideStatus: {
+		type: String,
+		enum: ["confirmed", "pending"],
+		default: "pending",
+	},
+	rideType: {
+		type: String,
+		enum: ["interstate", "intrastate"],
+		default: "intrastate",
 	},
 	createdAt: { type: Date, default: Date.now },
 })

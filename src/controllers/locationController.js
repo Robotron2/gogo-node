@@ -69,11 +69,7 @@ const getZonesByStateController = async (req, res) => {
 			return res.status(400).json({ error: "Provide the state" })
 		}
 
-		const zones = await Location.distinct("zone", { state: state.toLowerCase() })
-
-		if (zones.length === 0) {
-			return res.status(404).json({ error: "No zones found for the provided state" })
-		}
+		const zones = await Location.distinct("zone", { state: toLower(state) })
 
 		return res.status(200).json({ zones })
 	} catch (error) {
@@ -104,34 +100,13 @@ const getLocationsByZoneAndStateController = async (req, res) => {
 	}
 }
 
-// const getLocationsByStateController = async (req, res) => {
-// 	try {
-// 		const { state } = req.query
-
-// 		if (!state) {
-// 			return res.status(400).json({ error: "Provide your pickup state" })
-// 		}
-
-// 		const locations = await Location.find({ state: toLower(state) })
-
-// 		if (locations.length === 0) {
-// 			return res.status(404).json({ error: "No locations found for the provided state" })
-// 		}
-
-// 		return res.status(200).json({ locations })
-// 	} catch (error) {
-// 		console.error("Error in getLocationsByStateController:", error)
-// 		return res.status(500).json({ error: "Internal server error" })
-// 	}
-// }
-
 // Might not be needed.
 const updateLocationDetailsController = async (req, res) => {
 	try {
 		const { locationId } = req.params
 		const { name, zone, state } = req.body
 
-		if (!locationId || !isObjectIdOrHexString(locationId)) {
+		if (!locationId || !isValidObjectId(locationId)) {
 			return res.status(400).json({ error: "Invalid location ID" })
 		}
 
