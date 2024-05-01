@@ -24,7 +24,6 @@ const registerDriver = async (req, res) => {
 
 		await newDriver.save()
 		generateToken(newDriver._id, res)
-
 		return res.status(201).json({
 			id: newDriver._id,
 			fullname: newDriver.fullname,

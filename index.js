@@ -8,6 +8,7 @@ const { app, server } = require("./src/socket/socket")
 const port = process.env.PORT || 4000
 
 const routes = require("./src/routes")
+const adminRoute = routes.adminRoutes
 const authRoute = routes.authRoutes
 const driverAuthRoute = routes.driverAuthRoutes
 const driverRoute = routes.driverRoutes
@@ -26,6 +27,7 @@ app.use(
 app.use(express.json())
 app.use(cookieParser())
 
+app.use("/api/admin", adminRoute)
 app.use("/api/auth", authRoute)
 app.use("/api/auth/driver", driverAuthRoute)
 app.use("/api/driver", driverRoute)

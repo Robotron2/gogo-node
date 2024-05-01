@@ -5,6 +5,7 @@ const driverController = controllers.driverController
 const middlewares = require("../middlewares")
 const protectDriverRoute = middlewares.protectDriverRoute
 
+router.get("/get-driver-info", protectDriverRoute, driverController.getDriverInfoController)
 router.get("/get-car-info", protectDriverRoute, driverController.getDriverCarController)
 
 module.exports = router
