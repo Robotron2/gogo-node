@@ -1,0 +1,7 @@
+const express = require("express")
+const router = express.Router()
+const controllers = require("../controllers")
+
+const middlewares = require("../middlewares")
+
+module.exports = router

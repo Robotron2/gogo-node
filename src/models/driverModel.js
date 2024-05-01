@@ -32,8 +32,8 @@ const driverSchema = mongoose.Schema({
 	},
 	status: {
 		type: String,
-		enum: ["active", "driving"],
-		default: "active",
+		enum: ["active", "driving", "unavailable"],
+		default: "unavailable",
 	},
 	socketId: {
 		type: String,

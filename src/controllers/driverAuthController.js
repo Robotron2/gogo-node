@@ -32,6 +32,8 @@ const registerDriver = async (req, res) => {
 			isAdmin: newDriver.isAdmin,
 			isDriver: newDriver.isDriver,
 			isSuspended: newDriver.isSuspended,
+			isInterstateEnabled: newDriver.isInterstateEnabled,
+			status: newDriver.status,
 		})
 	} catch (error) {
 		console.log("Error in signup controller", error.message)
@@ -59,6 +61,8 @@ const loginDriver = async (req, res) => {
 			isAdmin: driver.isAdmin,
 			isDriver: driver.isDriver,
 			isSuspended: driver.isSuspended,
+			isInterstateEnabled: driver.isInterstateEnabled,
+			status: driver.status,
 		})
 	} catch (error) {
 		console.log("Error in login controller", error.message)
@@ -91,7 +95,7 @@ const authorizeDriverController = async (req, res) => {
 			message: "Authorized",
 		})
 	} catch (error) {
-		console.log("Error in authorize user controller", error.message)
+		console.log("Error in authorize driver controller", error.message)
 		return res.status(500).json({ error: "Internal server error" })
 	}
 }
