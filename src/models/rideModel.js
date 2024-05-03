@@ -15,6 +15,11 @@ const rideSchema = mongoose.Schema({
 		ref: "user",
 		required: true,
 	},
+	driver: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: "driver",
+		required: true,
+	},
 	car: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "car",

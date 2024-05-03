@@ -89,6 +89,10 @@ const bookRideController = async (req, res) => {
 			return res.status(400).json({ error: "Please provide valid pickup and drop-off locations" })
 		}
 
+		if (pickupArea === dropoffArea) {
+			return res.status(400).json({ error: "Pickup area and dropoff area cannot be the same." })
+		}
+
 		let availableDriver = await Driver.findOne({
 			isInterstateEnabled: rideType === "interstate",
 			status: "active",
@@ -125,6 +129,7 @@ const bookRideController = async (req, res) => {
 		const newRide = new Ride({
 			user: user._id,
 			car: car._id,
+			driver: availableDriver._id,
 			pickup: pickupLocation ? pickupLocation.name : "Unknown",
 			dropoff: dropoffLocation ? dropoffLocation.name : "Unknown",
 			paymentType,
@@ -154,7 +159,16 @@ const getUserRidesController = async (req, res) => {
 	try {
 		const { user } = req
 
+		const page = parseInt(req.query.page) || 1
+		const pageSize = parseInt(req.query.pageSize) || 4
+
+		const skip = (page - 1) * pageSize
+
 		const rides = await Ride.find({ user: user._id })
+			.select("pickup dropoff reroute price paymentType passenger rideType rideStatus driver")
+			// .populate("category")
+			.skip(skip)
+			.limit(pageSize)
 
 		if (rides.length === 0) {
 			return res.status(404).json({ error: "No rides available. Book now" })

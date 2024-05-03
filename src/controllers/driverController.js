@@ -8,7 +8,7 @@ const getDriverInfoController = async (req, res) => {
 
 		if (!user) return res.status(400).json({ error: "Unauthorized" })
 
-		const driver = await Driver.findById({ _id: user._id })
+		const driver = await Driver.findById({ _id: user._id }).select("status")
 
 		if (!driver) return res.status(500).json({ error: "Driver info not found" })
 
