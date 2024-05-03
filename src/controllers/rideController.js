@@ -134,12 +134,15 @@ const bookRideController = async (req, res) => {
 			rideType,
 			paymentStatus: paymentType === "cash" ? "paid" : "pending",
 		})
-		await newRide.save()
 
-		io.to(availableDriver.socketId).emit("rideBooked", { ride: newRide })
+		await newRide.save()
 		availableDriver.status = "driving"
 		await availableDriver.save()
 
+		io.to(availableDriver.socketId).emit("rideBooked", {
+			ride: newRide,
+			status: availableDriver?.status,
+		})
 		res.status(201).json(newRide)
 	} catch (error) {
 		console.log(error)

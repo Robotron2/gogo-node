@@ -100,6 +100,26 @@ const getLocationsByZoneAndStateController = async (req, res) => {
 	}
 }
 
+const getLocationNameFromId = async (req, res) => {
+	try {
+		const { pickup, dropoff } = req.query
+
+		if (!pickup || !dropoff) {
+			return res.status(400).json({ error: "Dropoff and Pickup IDs are required" })
+		}
+
+		const pickupLocationName = await Location.findById(pickup)
+		const dropoffLocationName = await Location.findById(dropoff)
+
+		const locations = { pickup: pickupLocationName.name, dropoff: dropoffLocationName.name }
+
+		return res.status(200).json({ locations })
+	} catch (error) {
+		console.error("Error in getLocationNameFromId:", error)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 // Might not be needed.
 const updateLocationDetailsController = async (req, res) => {
 	try {
@@ -173,7 +193,7 @@ module.exports = {
 	getStatesController,
 	getZonesByStateController,
 	getLocationsByZoneAndStateController,
-	// getLocationsByStateController,
+	getLocationNameFromId,
 	updateLocationDetailsController,
 	deleteLocationController,
 }
