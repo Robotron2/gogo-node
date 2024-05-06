@@ -26,6 +26,9 @@ const userSchema = mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+	socketId: {
+		type: String,
+	},
 })
 
 const User = mongoose.model("user", userSchema)
