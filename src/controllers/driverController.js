@@ -35,7 +35,27 @@ const getDriverCarController = async (req, res) => {
 	}
 }
 
+const toggleDriverStatus = async (req, res) => {
+	try {
+		const { status } = req.body
+		const driverId = req.user._id
+
+		const driver = await Driver.findById(driverId)
+		if (driver.status === "driving") {
+			return res.status(400).json({ error: "Cannot change status while driving" })
+		}
+
+		await Driver.findByIdAndUpdate(driverId, { status })
+
+		return res.status(200).json({ message: "Driver status updated successfully" })
+	} catch (error) {
+		console.error("Error updating driver status:", error)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 module.exports = {
 	getDriverCarController,
 	getDriverInfoController,
+	toggleDriverStatus,
 }

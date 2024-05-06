@@ -7,5 +7,6 @@ const protectDriverRoute = middlewares.protectDriverRoute
 
 router.get("/get-driver-info", protectDriverRoute, driverController.getDriverInfoController)
 router.get("/get-car-info", protectDriverRoute, driverController.getDriverCarController)
+router.put("/toggle-status", protectDriverRoute, driverController.toggleDriverStatus)
 
 module.exports = router
