@@ -16,8 +16,7 @@ const protectRoute = async (req, res, next) => {
 		if (!user) {
 			return res.status(401).json({ error: "User not found. Kindly login." })
 		}
-		if (user.isSuspended === true)
-			return res.status(401).json({ error: "Unauthorized. Suspended account" })
+
 		req.user = user
 		next()
 	} catch (error) {

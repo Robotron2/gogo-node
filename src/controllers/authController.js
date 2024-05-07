@@ -96,8 +96,25 @@ const authorizeUserController = async (req, res) => {
 	}
 }
 
+const authorizeAdminController = async (req, res) => {
+	try {
+		const { user } = req
+
+		if (!user) return res.status(400).json({ error: "Unauthorized" })
+		if (user.isSuspended) return res.status(400).json({ error: "Account suspended" })
+
+		return res.status(200).json({
+			message: "Authorized",
+		})
+	} catch (error) {
+		console.log("Error in authorize user controller", error.message)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 module.exports = {
 	authorizeUserController,
+	authorizeAdminController,
 	loginController,
 	registerController,
 	logoutController,
