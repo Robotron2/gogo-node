@@ -89,7 +89,7 @@ const getUserRidesController = async (req, res) => {
 		const { user } = req
 
 		const page = parseInt(req.query.page) || 1
-		const pageSize = parseInt(req.query.pageSize) || 4
+		const pageSize = parseInt(req.query.pageSize) || 10
 
 		const skip = (page - 1) * pageSize
 
@@ -123,7 +123,7 @@ const getDriverRidesController = async (req, res) => {
 		const { user } = req
 
 		const page = parseInt(req.query.page) || 1
-		const pageSize = parseInt(req.query.pageSize) || 4
+		const pageSize = parseInt(req.query.pageSize) || 10
 
 		const skip = (page - 1) * pageSize
 

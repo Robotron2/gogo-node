@@ -5,6 +5,9 @@ const isAdmin = async (req, res, next) => {
 		if (!user.isAdmin) {
 			return res.status(401).json({ error: "Unauthorized to access this route" })
 		}
+
+		if (user.isSuspended === true)
+			return res.status(401).json({ error: "Unauthorized. Suspended account" })
 		next()
 	} catch (error) {
 		console.log("Error in isAdmin middleware", error.message)
