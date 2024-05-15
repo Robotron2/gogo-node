@@ -7,5 +7,6 @@ const middlewares = require("../middlewares")
 const { protectRoute, isAdmin } = middlewares
 
 router.get("/get-rides", protectRoute, isAdmin, rideManagementController.getAllRides)
+router.get("/get-ridesPerMonth", protectRoute, isAdmin, rideManagementController.getRidesPerMonth)
 
 module.exports = router

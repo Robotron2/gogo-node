@@ -53,6 +53,45 @@ const getAllRides = async (req, res) => {
 	}
 }
 
+const getRidesPerMonth = async (req, res) => {
+	try {
+		const year = parseInt(req.query.year)
+
+		const ridesPerMonth = await Ride.aggregate([
+			{
+				$match: {
+					createdAt: {
+						$gte: new Date(`${year}-01-01`),
+						$lte: new Date(`${year}-12-31`),
+					},
+				},
+			},
+			{
+				$group: {
+					_id: { $month: "$createdAt" },
+					count: { $sum: 1 },
+				},
+			},
+			{
+				$sort: { _id: 1 },
+			},
+			{
+				$project: {
+					month: "$_id",
+					count: 1,
+					_id: 0,
+				},
+			},
+		])
+
+		res.status(200).json({ year, ridesPerMonth })
+	} catch (error) {
+		console.error("Error in getting rides per month:", error.message)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 module.exports = {
 	getAllRides,
+	getRidesPerMonth,
 }
