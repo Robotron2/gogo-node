@@ -35,6 +35,10 @@ const driverSchema = mongoose.Schema({
 		enum: ["active", "driving", "unavailable"],
 		default: "unavailable",
 	},
+	hasCar: {
+		type: Boolean,
+		default: false,
+	},
 	socketId: {
 		type: String,
 	},

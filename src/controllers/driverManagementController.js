@@ -57,11 +57,11 @@ const assignCarController = async (req, res) => {
 			return res.status(400).json({ error: "Please provide all car details" })
 		}
 
-		await Driver.findByIdAndUpdate(driver, { status: "active" })
-
 		const newCar = new Car({ driver, model, vin, platenumber, color })
 
 		await newCar.save()
+
+		await Driver.findByIdAndUpdate(driver, { hasCar: true })
 
 		return res.status(200).json({ newCar })
 	} catch (error) {
