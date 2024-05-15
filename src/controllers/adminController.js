@@ -1,20 +1,13 @@
 const createCarController = async (req, res) => {
-	const { driver, model, vin, platenumber, color } = req.body
+	const { model, vin, platenumber, color } = req.body
 	try {
-		const match = await Car.findOne({ driver })
-		if (match) {
-			return res.status(400).json({ error: "Driver owns a car already" })
-		}
 		const newCar = new Car({
-			driver,
 			model,
 			vin,
 			platenumber,
 			color,
 		})
-		const driverDetails = await Driver.findById(driver)
-		driverDetails.status = "active"
-		await driverDetails.save()
+
 		await newCar.save()
 
 		return res.status(201).json(newCar)

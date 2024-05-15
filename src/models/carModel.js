@@ -4,7 +4,6 @@ const carSchema = mongoose.Schema({
 	driver: {
 		type: mongoose.Schema.Types.ObjectId,
 		ref: "driver",
-		required: true,
 	},
 	model: {
 		type: String,

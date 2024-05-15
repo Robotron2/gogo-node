@@ -1,5 +1,6 @@
 const models = require("../models")
 const Driver = models.Driver
+const Car = models.Car
 
 const getAllDriverController = async (req, res) => {
 	try {
@@ -37,6 +38,64 @@ const getAllDriverController = async (req, res) => {
 	}
 }
 
+const assignCarController = async (req, res) => {
+	try {
+		const { driver } = req.query
+		const { model, vin, platenumber, color } = req.body
+
+		if (!driver) {
+			return res.status(400).json({ error: "Driver ID is required" })
+		}
+
+		const match = await Car.findOne({ driver })
+
+		if (match) {
+			return res.status(400).json({ error: "Driver owns a car already" })
+		}
+
+		if (!model || !vin || !platenumber || !color) {
+			return res.status(400).json({ error: "Please provide all car details" })
+		}
+
+		await Driver.findByIdAndUpdate(driver, { status: "active" })
+
+		const newCar = new Car({ driver, model, vin, platenumber, color })
+
+		await newCar.save()
+
+		return res.status(200).json({ newCar })
+	} catch (error) {
+		console.error("Error in assign car controller:", error)
+		return res.status(500).json({ error: "Failed to assign car", message: error.message })
+	}
+}
+
+const updateCarDriver = async (req, res) => {
+	try {
+		const { driver } = req.body
+		const { carId } = req.query
+
+		if (!driver) {
+			return res.status(400).json({ error: "Driver ID is required" })
+		}
+
+		const match = await Car.findOne({ driver })
+
+		if (match) {
+			return res.status(400).json({ error: "Driver owns a car already" })
+		}
+
+		await Car.findByIdAndUpdate(carId, { driver })
+
+		return res.status(200).json({ message: "Car driver updated successfully" })
+	} catch (error) {
+		console.error("Error in update car driver controller:", error)
+		return res.status(500).json({ error: "Failed to update car driver", message: error.message })
+	}
+}
+
 module.exports = {
 	getAllDriverController,
+	assignCarController,
+	updateCarDriver,
 }
