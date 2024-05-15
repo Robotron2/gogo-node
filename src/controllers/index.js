@@ -5,6 +5,7 @@ const driverController = require("./driverController")
 const locationController = require("./locationController")
 const pricingController = require("./pricingController")
 const userManagementController = require("./userManagementController")
+const driverManagementController = require("./driverManagementController")
 const rideController = require("./rideController")
 
 module.exports = {
@@ -15,5 +16,6 @@ module.exports = {
 	locationController,
 	pricingController,
 	userManagementController,
+	driverManagementController,
 	rideController,
 }

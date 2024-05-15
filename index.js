@@ -15,6 +15,7 @@ const driverRoute = routes.driverRoutes
 const locationRoute = routes.locationRoutes
 const pricingRoute = routes.pricingRoutes
 const userManagementRoute = routes.userManagementRoutes
+const driverManagementRoute = routes.driverManagementRoutes
 const rideRoute = routes.rideRoutes
 
 app.use(
@@ -35,6 +36,7 @@ app.use("/api/driver", driverRoute)
 app.use("/api/location", locationRoute)
 app.use("/api/pricing", pricingRoute)
 app.use("/api/admin/user-management", userManagementRoute)
+app.use("/api/admin/driver-management", driverManagementRoute)
 app.use("/api/ride", rideRoute)
 
 app.get("/", (req, res) => {

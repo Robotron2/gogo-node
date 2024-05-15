@@ -5,6 +5,7 @@ const driverRoutes = require("./driverRoute")
 const locationRoutes = require("./locationRoute")
 const pricingRoutes = require("./pricingRoute")
 const userManagementRoutes = require("./userManagementRoute")
+const driverManagementRoutes = require("./driverManagementRoute")
 const rideRoutes = require("./rideRoute")
 
 module.exports = {
@@ -15,5 +16,6 @@ module.exports = {
 	locationRoutes,
 	pricingRoutes,
 	userManagementRoutes,
+	driverManagementRoutes,
 	rideRoutes,
 }
