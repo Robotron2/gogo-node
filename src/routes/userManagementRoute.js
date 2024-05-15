@@ -6,9 +6,6 @@ const userManagement = controllers.userManagementController
 const middlewares = require("../middlewares")
 const { protectRoute, isAdmin } = middlewares
 
-router.get("/get-users", userManagement.getAllUsersController)
-// router.get("/get-users", protectRoute, isAdmin, (req, res) => {
-// 	res.status(200)
-// })
+router.get("/get-users", protectRoute, isAdmin, userManagement.getAllUsersController)
 
 module.exports = router
