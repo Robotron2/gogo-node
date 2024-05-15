@@ -8,5 +8,11 @@ const { protectRoute, isAdmin } = middlewares
 
 router.get("/get-rides", protectRoute, isAdmin, rideManagementController.getAllRides)
 router.get("/get-ridesPerMonth", protectRoute, isAdmin, rideManagementController.getRidesPerMonth)
+router.get(
+	"/get-rideTypeDistribution",
+	// protectRoute,
+	// isAdmin,
+	rideManagementController.getRideTypeDistribution
+)
 
 module.exports = router

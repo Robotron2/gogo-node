@@ -91,7 +91,33 @@ const getRidesPerMonth = async (req, res) => {
 	}
 }
 
+const getRideTypeDistribution = async (req, res) => {
+	try {
+		const rideTypeDistribution = await Ride.aggregate([
+			{
+				$group: {
+					_id: "$rideType",
+					count: { $sum: 1 },
+				},
+			},
+			{
+				$project: {
+					rideType: "$_id",
+					count: 1,
+					_id: 0,
+				},
+			},
+		])
+
+		res.status(200).json({ rideTypeDistribution })
+	} catch (error) {
+		console.error("Error in getting ride type distribution:", error.message)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 module.exports = {
 	getAllRides,
 	getRidesPerMonth,
+	getRideTypeDistribution,
 }
