@@ -14,9 +14,10 @@ const driverAuthRoute = routes.driverAuthRoutes
 const driverRoute = routes.driverRoutes
 const locationRoute = routes.locationRoutes
 const pricingRoute = routes.pricingRoutes
+const rideRoute = routes.rideRoutes
 const userManagementRoute = routes.userManagementRoutes
 const driverManagementRoute = routes.driverManagementRoutes
-const rideRoute = routes.rideRoutes
+const rideManagementRoute = routes.rideManagementRoutes
 
 app.use(
 	cors({
@@ -35,9 +36,10 @@ app.use("/api/auth/driver", driverAuthRoute)
 app.use("/api/driver", driverRoute)
 app.use("/api/location", locationRoute)
 app.use("/api/pricing", pricingRoute)
+app.use("/api/ride", rideRoute)
 app.use("/api/admin/user-management", userManagementRoute)
 app.use("/api/admin/driver-management", driverManagementRoute)
-app.use("/api/ride", rideRoute)
+app.use("/api/admin/ride-management", rideManagementRoute)
 
 app.get("/", (req, res) => {
 	res.status(200).json({
