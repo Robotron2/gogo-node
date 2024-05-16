@@ -26,6 +26,7 @@ const bookRideController = async (req, res) => {
 			isInterstateEnabled: rideType === "interstate",
 			status: "active",
 			hasCar: true,
+			online: true,
 		})
 		if (!availableDriver) {
 			return res.status(404).json({ error: `No available drivers for this ${rideType} ride type` })

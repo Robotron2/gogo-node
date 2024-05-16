@@ -37,6 +37,7 @@ io.on("connection", (socket) => {
 			const driver = await Driver.findById(driverId)
 			if (driver) {
 				driver.socketId = socket.id
+				driver.online = true
 				await driver.save()
 				console.log(`Driver ${driverId} connected with socket ID: ${socket.id}`)
 			}
@@ -45,8 +46,17 @@ io.on("connection", (socket) => {
 		}
 	})
 
-	socket.on("disconnect", () => {
-		console.log("Client disconnected")
+	socket.on("disconnect", async () => {
+		try {
+			const driver = await Driver.findOne({ socketId: socket.id })
+			if (driver) {
+				driver.online = false
+				await driver.save()
+				console.log(`Driver ${driver._id} disconnected`)
+			}
+		} catch (error) {
+			console.error("Error updating driver online status:", error)
+		}
 	})
 })
 

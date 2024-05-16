@@ -30,10 +30,15 @@ const driverSchema = mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+
 	status: {
 		type: String,
 		enum: ["active", "driving", "unavailable"],
 		default: "unavailable",
+	},
+	online: {
+		type: Boolean,
+		default: false,
 	},
 	hasCar: {
 		type: Boolean,
