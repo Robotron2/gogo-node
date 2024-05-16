@@ -205,7 +205,7 @@ const getRidesPerMonth = async (req, res) => {
 			{
 				$group: {
 					_id: { $month: "$createdAt" },
-					totalIncome: { $sum: { $toDouble: "$price" } },
+					income: { $sum: { $toDouble: "$price" } },
 				},
 			},
 			{
@@ -214,7 +214,7 @@ const getRidesPerMonth = async (req, res) => {
 			{
 				$project: {
 					month: "$_id",
-					totalIncome: "$totalIncome",
+					income: "$income",
 					_id: 0,
 				},
 			},
