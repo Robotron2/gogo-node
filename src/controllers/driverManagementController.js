@@ -10,14 +10,12 @@ const getAllDriverController = async (req, res) => {
 		const skip = (page - 1) * pageSize
 
 		const filter = {}
-
-		const search = req.query.search
-		if (search) {
-			filter.$or = [
-				{ fullname: { $regex: search, $options: "i" } },
-				{ email: { $regex: search, $options: "i" } },
-			]
-		}
+		const allowedFilters = ["fullname", "email"]
+		allowedFilters.forEach((field) => {
+			if (req.query[field]) {
+				filter[field] = { $regex: req.query[field], $options: "i" }
+			}
+		})
 
 		const sortField = req.query.sortField || "createdAt"
 		const sortOrder = req.query.sortOrder || "desc"
@@ -25,7 +23,7 @@ const getAllDriverController = async (req, res) => {
 		sort[sortField] = sortOrder
 
 		const allDrivers = await Driver.find(filter)
-			.select("email fullname isAdmin isSuspended isDriver")
+			.select("email fullname isAdmin isSuspended isDriver hasCar")
 			.sort(sort)
 			.skip(skip)
 			.limit(pageSize)
