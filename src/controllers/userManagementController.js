@@ -17,7 +17,6 @@ const getAllUsersController = async (req, res) => {
 				{ email: { $regex: search, $options: "i" } },
 			]
 		}
-		console.log(filter)
 
 		const sortField = req.query.sortField || "createdAt"
 		const sortOrder = req.query.sortOrder || "desc"
