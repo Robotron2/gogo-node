@@ -9,14 +9,12 @@ const getAllUsersController = async (req, res) => {
 		const skip = (page - 1) * pageSize
 
 		const filter = { isAdmin: false }
-
-		const search = req.query.search
-		if (search) {
-			filter.$or = [
-				{ fullname: { $regex: search, $options: "i" } },
-				{ email: { $regex: search, $options: "i" } },
-			]
-		}
+		const allowedFilters = ["fullname", "email"]
+		allowedFilters.forEach((field) => {
+			if (req.query[field]) {
+				filter[field] = { $regex: req.query[field], $options: "i" }
+			}
+		})
 
 		const sortField = req.query.sortField || "createdAt"
 		const sortOrder = req.query.sortOrder || "desc"
