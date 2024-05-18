@@ -1,3 +1,4 @@
+const { isValidObjectId } = require("mongoose")
 const models = require("../models")
 const User = models.User
 
@@ -37,6 +38,26 @@ const getAllUsersController = async (req, res) => {
 	}
 }
 
+const handleUserStatusController = async (req, res) => {
+	const { id } = req.query
+
+	try {
+		if (!id || !isValidObjectId) {
+			throw Error("Provide a valid user id")
+		}
+
+		const user = await User.findById(id)
+
+		await User.findByIdAndUpdate({ _id: id }, { isSuspended: !user.isSuspended })
+
+		res.status(200).json({ message: "User status changed successfully." })
+	} catch (error) {
+		console.log("Error in handle user status controller", error.message)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 module.exports = {
 	getAllUsersController,
+	handleUserStatusController,
 }
