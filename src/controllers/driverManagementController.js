@@ -23,7 +23,7 @@ const getAllDriverController = async (req, res) => {
 		sort[sortField] = sortOrder
 
 		const allDrivers = await Driver.find(filter)
-			.select("email fullname isAdmin isSuspended isDriver hasCar")
+			.select("email fullname isAdmin isSuspended isDriver hasCar isInterstateEnabled")
 			.sort(sort)
 			.skip(skip)
 			.limit(pageSize)
@@ -33,6 +33,17 @@ const getAllDriverController = async (req, res) => {
 		res.status(200).json({ allDrivers, totalCount })
 	} catch (error) {
 		console.log("Error in get Drivers controller", error.message)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
+const getDriversWithoutCar = async (req, res) => {
+	try {
+		const allDrivers = await Driver.find({ hasCar: false }).select("email fullname")
+
+		res.status(200).json({ allDrivers })
+	} catch (error) {
+		console.log("Error in get Drivers without car controller", error.message)
 		return res.status(500).json({ error: "Internal server error" })
 	}
 }
@@ -114,6 +125,7 @@ const handleDriverStatusController = async (req, res) => {
 
 module.exports = {
 	getAllDriverController,
+	getDriversWithoutCar,
 	assignCarController,
 	updateCarDriver,
 	handleDriverStatusController,
