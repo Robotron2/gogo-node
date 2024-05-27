@@ -4,12 +4,12 @@ const pricingSchema = mongoose.Schema(
 	{
 		pickupLocation: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Location",
+			ref: "location",
 			required: true,
 		},
 		dropoffLocation: {
 			type: mongoose.Schema.Types.ObjectId,
-			ref: "Location",
+			ref: "location",
 			required: true,
 		},
 		intrastatePrice: {
