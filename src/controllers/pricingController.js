@@ -87,10 +87,10 @@ const updateLocationPricingController = async (req, res) => {
       return res.status(404).json({ error: "Pricing not found" }) 
     }
 
-    if (interstatePrice !== undefined) {
+    if (interstatePrice !== undefined && !isNaN(interstatePrice)) {
       pricing.interstatePrice = interstatePrice 
     }
-    if (intrastatePrice !== undefined) {
+    if (intrastatePrice !== undefined && !isNaN(intrastatePrice)) {
       pricing.intrastatePrice = intrastatePrice 
     }
 
