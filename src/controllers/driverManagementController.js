@@ -1,132 +1,146 @@
 const { isValidObjectId } = require("mongoose")
 const models = require("../models")
+const { io } = require("../socket/socket")
 const Driver = models.Driver
 const Car = models.Car
 
 const getAllDriverController = async (req, res) => {
-	try {
-		const page = parseInt(req.query.page) || 1
-		const pageSize = parseInt(req.query.pageSize) || 10
-		const skip = (page - 1) * pageSize
+    try {
+        const page = parseInt(req.query.page) || 1
+        const pageSize = parseInt(req.query.pageSize) || 10
+        const skip = (page - 1) * pageSize
 
-		const filter = {}
-		const allowedFilters = ["fullname", "email"]
-		allowedFilters.forEach((field) => {
-			if (req.query[field]) {
-				filter[field] = { $regex: req.query[field], $options: "i" }
-			}
-		})
+        const filter = {}
+        const allowedFilters = ["fullname", "email"]
+        allowedFilters.forEach((field) => {
+            if (req.query[field]) {
+                filter[field] = { $regex: req.query[field], $options: "i" }
+            }
+        })
 
-		const sortField = req.query.sortField || "createdAt"
-		const sortOrder = req.query.sortOrder || "desc"
-		const sort = {}
-		sort[sortField] = sortOrder
+        const sortField = req.query.sortField || "createdAt"
+        const sortOrder = req.query.sortOrder || "desc"
+        const sort = {}
+        sort[sortField] = sortOrder
 
-		const allDrivers = await Driver.find(filter)
-			.select("email fullname isAdmin isSuspended isDriver hasCar isInterstateEnabled")
-			.sort(sort)
-			.skip(skip)
-			.limit(pageSize)
+        const allDrivers = await Driver.find(filter)
+            .select("email fullname isAdmin isSuspended isDriver hasCar isInterstateEnabled")
+            .sort(sort)
+            .skip(skip)
+            .limit(pageSize)
 
-		const totalCount = await Driver.countDocuments(filter)
+        const totalCount = await Driver.countDocuments(filter)
 
-		res.status(200).json({ allDrivers, totalCount })
-	} catch (error) {
-		console.log("Error in get Drivers controller", error.message)
-		return res.status(500).json({ error: "Internal server error" })
-	}
+        res.status(200).json({ allDrivers, totalCount })
+    } catch (error) {
+        console.log("Error in get Drivers controller", error.message)
+        return res.status(500).json({ error: "Internal server error" })
+    }
 }
 
 const getDriversWithoutCar = async (req, res) => {
-	try {
-		const allDrivers = await Driver.find({ hasCar: false }).select("email fullname")
+    try {
+        const allDrivers = await Driver.find({ hasCar: false }).select("email fullname")
 
-		res.status(200).json({ allDrivers })
-	} catch (error) {
-		console.log("Error in get Drivers without car controller", error.message)
-		return res.status(500).json({ error: "Internal server error" })
-	}
+        res.status(200).json({ allDrivers })
+    } catch (error) {
+        console.log("Error in get Drivers without car controller", error.message)
+        return res.status(500).json({ error: "Internal server error" })
+    }
 }
 
 const assignCarController = async (req, res) => {
-	try {
-		const { driver } = req.query
-		const { model, vin, platenumber, color } = req.body
+    try {
+        const { driver } = req.query
+        const { model, vin, platenumber, color } = req.body
 
-		if (!driver) {
-			return res.status(400).json({ error: "Driver ID is required" })
-		}
+        if (!driver || !isValidObjectId(driver)) {
+            return res.status(400).json({ error: "Driver ID is required" })
+        }
 
-		const match = await Car.findOne({ driver })
+        const match = await Car.findOne({ driver })
 
-		if (match) {
-			return res.status(400).json({ error: "Driver owns a car already" })
-		}
+        if (match) {
+            return res.status(400).json({ error: "Driver owns a car already" })
+        }
 
-		if (!model || !vin || !platenumber || !color) {
-			return res.status(400).json({ error: "Please provide all car details" })
-		}
+        if (!model || !vin || !platenumber || !color) {
+            return res.status(400).json({ error: "Please provide all car details" })
 
-		const newCar = new Car({ driver, model, vin, platenumber, color })
+        }
 
-		await newCar.save()
+        const newCar = new Car({ driver, model, vin, platenumber, color })
 
-		await Driver.findByIdAndUpdate(driver, { hasCar: true })
+        await newCar.save()
 
-		return res.status(200).json({ newCar })
-	} catch (error) {
-		console.error("Error in assign car controller:", error)
-		return res.status(500).json({ error: "Failed to assign car", message: error.message })
-	}
+        let driverObject = await Driver.findById(driver)
+
+        if (!driverObject) {
+            await Car.findOneAndDelete({ driver })
+            return res.status(500).json({ error: "Car could not be assigned. Driver issues." })
+        }
+
+        driverObject.hasCar = true
+        driverObject.status = "active"
+        io.to(driverObject.socketId).emit("assigned", {
+            status: driverObject.status,
+        })
+        await driverObject.save()
+
+        return res.status(200).json({ newCar })
+    } catch (error) {
+        console.error("Error in assign car controller:", error)
+        return res.status(500).json({ error: "Failed to assign car", message: error.message })
+    }
 }
 
 const updateCarDriver = async (req, res) => {
-	try {
-		const { driver } = req.body
-		const { carId } = req.query
+    try {
+        const { driver } = req.body
+        const { carId } = req.query
 
-		if (!driver) {
-			return res.status(400).json({ error: "Driver ID is required" })
-		}
+        if (!driver) {
+            return res.status(400).json({ error: "Driver ID is required" })
+        }
 
-		const match = await Car.findOne({ driver })
+        const match = await Car.findOne({ driver })
 
-		if (match) {
-			return res.status(400).json({ error: "Driver owns a car already" })
-		}
+        if (match) {
+            return res.status(400).json({ error: "Driver owns a car already" })
+        }
 
-		await Car.findByIdAndUpdate(carId, { driver })
+        await Car.findByIdAndUpdate(carId, { driver })
 
-		return res.status(200).json({ message: "Car driver updated successfully" })
-	} catch (error) {
-		console.error("Error in update car driver controller:", error)
-		return res.status(500).json({ error: "Failed to update car driver", message: error.message })
-	}
+        return res.status(200).json({ message: "Car driver updated successfully" })
+    } catch (error) {
+        console.error("Error in update car driver controller:", error)
+        return res.status(500).json({ error: "Failed to update car driver", message: error.message })
+    }
 }
 
 const handleDriverStatusController = async (req, res) => {
-	const { id } = req.query
+    const { id } = req.query
 
-	try {
-		if (!id || !isValidObjectId) {
-			throw Error("Provide a valid user id")
-		}
+    try {
+        if (!id || !isValidObjectId) {
+            throw Error("Provide a valid user id")
+        }
 
-		const driver = await Driver.findById(id)
+        const driver = await Driver.findById(id)
 
-		await Driver.findByIdAndUpdate({ _id: id }, { isSuspended: !driver.isSuspended })
+        await Driver.findByIdAndUpdate({ _id: id }, { isSuspended: !driver.isSuspended })
 
-		res.status(200).json({ message: "User status changed successfully." })
-	} catch (error) {
-		console.log("Error in handle user status controller", error.message)
-		return res.status(500).json({ error: "Internal server error" })
-	}
+        res.status(200).json({ message: "User status changed successfully." })
+    } catch (error) {
+        console.log("Error in handle user status controller", error.message)
+        return res.status(500).json({ error: "Internal server error" })
+    }
 }
 
 module.exports = {
-	getAllDriverController,
-	getDriversWithoutCar,
-	assignCarController,
-	updateCarDriver,
-	handleDriverStatusController,
+    getAllDriverController,
+    getDriversWithoutCar,
+    assignCarController,
+    updateCarDriver,
+    handleDriverStatusController,
 }
