@@ -1,13 +1,13 @@
-require("dotenv").config()
-const express = require("express")
-const cookieParser = require("cookie-parser")
-const cors = require("cors")
-const connectToDB = require("./src/config/db")
-const { app, server } = require("./src/socket/socket")
+require( "dotenv" ).config()
+const express = require( "express" )
+const cookieParser = require( "cookie-parser" )
+const cors = require( "cors" )
+const connectToDB = require( "./src/config/db" )
+const {app, server} = require( "./src/socket/socket" )
 
 const port = process.env.PORT || 4000
 
-const routes = require("./src/routes")
+const routes = require( "./src/routes" )
 const adminRoute = routes.adminRoutes
 const authRoute = routes.authRoutes
 const driverAuthRoute = routes.driverAuthRoutes
@@ -20,35 +20,35 @@ const driverManagementRoute = routes.driverManagementRoutes
 const rideManagementRoute = routes.rideManagementRoutes
 
 app.use(
-	cors({
-		origin: process.env.CLIENT_ORIGIN,
-		methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-		credentials: true,
-	})
+    cors( {
+        origin: process.env.CLIENT_ORIGIN,
+        methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+        credentials: true,
+    } )
 )
 
-app.use(express.json())
-app.use(cookieParser())
+app.use( express.json() )
+app.use( cookieParser() )
 
-app.use("/api/admin", adminRoute)
-app.use("/api/auth", authRoute)
-app.use("/api/auth/driver", driverAuthRoute)
-app.use("/api/driver", driverRoute)
-app.use("/api/location", locationRoute)
-app.use("/api/pricing", pricingRoute)
-app.use("/api/ride", rideRoute)
-app.use("/api/admin/user-management", userManagementRoute)
-app.use("/api/admin/driver-management", driverManagementRoute)
-app.use("/api/admin/ride-management", rideManagementRoute)
+app.use( "/api/admin", adminRoute )
+app.use( "/api/auth", authRoute )
+app.use( "/api/auth/driver", driverAuthRoute )
+app.use( "/api/driver", driverRoute )
+app.use( "/api/location", locationRoute )
+app.use( "/api/pricing", pricingRoute )
+app.use( "/api/ride", rideRoute )
+app.use( "/api/admin/user-management", userManagementRoute )
+app.use( "/api/admin/driver-management", driverManagementRoute )
+app.use( "/api/admin/ride-management", rideManagementRoute )
 
-app.get("/", (req, res) => {
-	res.status(200).json({
-		success: true,
-		message: "Server running properly",
-	})
-})
+app.get( "/", ( req, res ) => {
+    res.status( 200 ).json( {
+        success: true,
+        message: "Server running properly",
+    } )
+} )
 
-server.listen(port, () => {
-	connectToDB()
-	console.log(`App is running on port ${port}`)
-})
+server.listen( port, () => {
+    connectToDB()
+    console.log( `App is running on port ${ port }` )
+} )
