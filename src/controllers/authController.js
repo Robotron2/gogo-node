@@ -69,7 +69,7 @@ const loginController = async ( req, res ) => {
 
 const logoutController = async ( req, res ) => {
     try {
-        res.cookie( 'jwt', '', {
+        res.cookie( "jwt", "", {
             maxAge: 0,
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
