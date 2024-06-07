@@ -73,7 +73,7 @@ const logoutController = async ( req, res ) => {
             maxAge: 0,
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'None',
+            sameSite: process.env.NODE_ENV === "development" ? "strict" : "None",
         } )
 
         return res.status( 200 ).json( {

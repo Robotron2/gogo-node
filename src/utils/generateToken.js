@@ -9,7 +9,7 @@ const generateToken = async ( userId, res ) => {
         maxAge: 3 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None',
+        sameSite: process.env.NODE_ENV === "development" ? "strict" : "None",
     } )
 }
 
