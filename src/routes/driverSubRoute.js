@@ -20,6 +20,7 @@ router.post( '/subscribe-driver', async ( req, res ) => {
 
             existingSubscription.endpoint = subscription.endpoint
             existingSubscription.keys = subscription.keys
+            console.log( "subscription updated" )
             await existingSubscription.save()
         } else {
 
@@ -29,8 +30,8 @@ router.post( '/subscribe-driver', async ( req, res ) => {
                 keys: subscription.keys
             } )
             await newDriverSub.save()
+            console.log( "Driver subscribed." )
         }
-
         res.status( 201 ).json( {success: true} )
     } catch ( error ) {
         console.error( 'Error in subscribe-driver route:', error.message )
