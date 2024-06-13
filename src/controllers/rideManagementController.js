@@ -329,8 +329,49 @@ const getRideTypeDistribution = async ( req, res ) => {
     }
 }
 
+
+const getOtherDashboardData = async ( req, res ) => {
+    try {
+        // Fetch the total number of rides
+        const totalRides = await Ride.countDocuments()
+
+        // Fetch the total number of customers
+        const totalCustomers = await Customer.countDocuments()
+
+        // Fetch the total number of orders
+        const totalOrders = await Order.countDocuments()
+
+        // Assuming you have a way to get the increase in data, such as from a separate collection or by comparing with the previous data
+        // For the sake of this example, we will use placeholder values
+        const increaseInRides = 343 // Example increase in rides
+        const increaseInCustomers = 30 // Example increase in customers
+        const increaseInOrders = 43 // Example increase in orders
+
+        // Send the response
+        return res.status( 200 ).json( {
+            totalRides: {
+                amount: totalRides,
+                increase: increaseInRides,
+            },
+            totalCustomers: {
+                amount: totalCustomers,
+                increase: increaseInCustomers,
+            },
+            totalOrders: {
+                amount: totalOrders,
+                increase: increaseInOrders,
+            },
+        } )
+    } catch ( error ) {
+        console.error( 'Error in getting dashboard data:', error.message )
+        return res.status( 500 ).json( {error: 'Internal server error'} )
+    }
+}
+
+
 module.exports = {
     getAllRides,
     getRidesPerMonth,
     getRideTypeDistribution,
+    getOtherDashboardData
 }

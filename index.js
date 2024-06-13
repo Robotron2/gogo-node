@@ -4,7 +4,7 @@ const cookieParser = require( "cookie-parser" )
 const cors = require( "cors" )
 const connectToDB = require( "./src/config/db" )
 const {app, server} = require( "./src/socket/socket" )
-
+const cronJobs = require( "./cronJob" )
 const port = process.env.PORT || 4000
 
 const routes = require( "./src/routes" )
@@ -17,6 +17,7 @@ const pricingRoute = routes.pricingRoutes
 const rideRoute = routes.rideRoutes
 const userManagementRoute = routes.userManagementRoutes
 const driverManagementRoute = routes.driverManagementRoutes
+const driverSubRoute = routes.driverSubRoutes
 const rideManagementRoute = routes.rideManagementRoutes
 
 app.use(
@@ -40,12 +41,17 @@ app.use( "/api/ride", rideRoute )
 app.use( "/api/admin/user-management", userManagementRoute )
 app.use( "/api/admin/driver-management", driverManagementRoute )
 app.use( "/api/admin/ride-management", rideManagementRoute )
+app.use( "/api/push-subscription", driverSubRoute )
 
 app.get( "/", ( req, res ) => {
     res.status( 200 ).json( {
         success: true,
         message: "Server running properly",
     } )
+} )
+
+app.get( '/ping', ( req, res ) => {
+    res.send( 'Pong' )
 } )
 
 server.listen( port, () => {
