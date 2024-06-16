@@ -10,83 +10,6 @@ const Subscription = models.DriverSubSchema
 const {io} = require( "../socket/socket" )
 const webpush = require( "web-push" )
 
-// const bookRideController = async (req, res) => {
-// 	const { pickupArea, dropoffArea, passengers, reroute, paymentType, rideType } = req.body
-
-// 	const { user } = req
-
-// 	try {
-// 		if (!isValidObjectId(pickupArea) || !isValidObjectId(dropoffArea)) {
-// 			return res.status(400).json({ error: "Please provide valid pickup and drop-off locations" })
-// 		}
-
-// 		if (pickupArea === dropoffArea) {
-// 			return res.status(400).json({ error: "Pickup area and dropoff area cannot be the same." })
-// 		}
-
-// 		let availableDriver = await Driver.findOne({
-// 			isInterstateEnabled: rideType === "interstate",
-// 			status: "active",
-// 			hasCar: true,
-// 			online: true,
-// 		})
-// 		if (!availableDriver) {
-// 			return res.status(404).json({ error: `No available drivers for this ${rideType} ride type` })
-// 		}
-
-// 		const pricing = await Pricing.findOne({
-// 			$or: [
-// 				{ pickupLocation: pickupArea, dropoffLocation: dropoffArea },
-// 				{ pickupLocation: dropoffArea, dropoffLocation: pickupArea },
-// 			],
-// 		})
-
-// 		//Pricing === zero
-// 		if (
-// 			!pricing ||
-// 			(rideType === "interstate" && pricing.interstatePrice === 0) ||
-// 			(rideType === "intrastate" && pricing.intrastatePrice === 0)
-// 		) {
-// 			return res.status(404).json({ error: "No pricing available for this ride" })
-// 		}
-
-// 		// Get the names of the pickup and drop-off locations
-// 		const pickupLocation = await Location.findById(pickupArea)
-// 		const dropoffLocation = await Location.findById(dropoffArea)
-
-// 		const basePrice = rideType === "interstate" ? pricing.interstatePrice : pricing.intrastatePrice
-// 		const totalPrice = basePrice * passengers * (reroute ? 1.5 : 1)
-
-// 		const car = await Car.findOne({ driver: availableDriver._id })
-
-// 		const newRide = new Ride({
-// 			user: user._id,
-// 			car: car._id,
-// 			driver: availableDriver._id,
-// 			pickup: pickupLocation ? pickupLocation.name : "Unknown",
-// 			dropoff: dropoffLocation ? dropoffLocation.name : "Unknown",
-// 			paymentType,
-// 			price: totalPrice.toString(),
-// 			passengers,
-// 			reroute,
-// 			rideType,
-// 			paymentStatus: paymentType === "cash" ? "paid" : "pending",
-// 		})
-
-// 		await newRide.save()
-// 		availableDriver.status = "driving"
-// 		await availableDriver.save()
-
-// 		io.to(availableDriver.socketId).emit("rideBooked", {
-// 			ride: newRide,
-// 			status: availableDriver?.status,
-// 		})
-// 		res.status(201).json(newRide)
-// 	} catch (error) {
-// 		console.log(error)
-// 		res.status(500).json({ error: "Failed to book the ride", message: error.message })
-// 	}
-// }
 
 webpush.setVapidDetails(
     'mailto:greyhat320@gmail.com',
@@ -95,14 +18,14 @@ webpush.setVapidDetails(
 )
 
 const sendNotification = async ( subscription, data ) => {
+    console.log( data )
+    console.log( subscription )
     try {
-        await webpush.sendNotification( subscription, JSON.stringify( data ) )
-        // console.group()
-        // console.log( "Data", data )
-        // console.log( "Sub", subscription )
-        // console.groupEnd()
+
+        const ntf = await webpush.sendNotification( subscription, JSON.stringify( data ) )
+        console.log( "Notification sent", ntf )
     } catch ( error ) {
-        console.error( 'Error sending notification', error )
+        console.log( error )
     }
 }
 
@@ -137,11 +60,9 @@ const bookRideController = async ( req, res ) => {
             ],
         } )
 
-        if (
-            !pricing ||
+        if ( !pricing ||
             ( rideType === "interstate" && pricing.interstatePrice === 0 ) ||
-            ( rideType === "intrastate" && pricing.intrastatePrice === 0 )
-        ) {
+            ( rideType === "intrastate" && pricing.intrastatePrice === 0 ) ) {
             return res.status( 404 ).json( {error: "No pricing available for this ride"} )
         }
 
@@ -176,9 +97,7 @@ const bookRideController = async ( req, res ) => {
             status: availableDriver?.status,
         } )
 
-
-        const subscription = await Subscription.findOne( {driverId: availableDriver._id} )
-        // console.log( "Sub in ride controller ", subscription )
+        const subscription = await Subscription.findOne( {driverId: availableDriver._id} ).select( "-driverId" )
 
         if ( subscription ) {
             const notificationPayload = {
