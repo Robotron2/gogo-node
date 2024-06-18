@@ -125,32 +125,16 @@ const bookRideController = async ( req, res ) => {
 
 const getUserRidesController = async ( req, res ) => {
     try {
-        const {user} = req
+        const {rideId} = req.params
 
-        const page = parseInt( req.query.page ) || 1
-        const pageSize = parseInt( req.query.pageSize ) || 10
-
-        const skip = ( page - 1 ) * pageSize
-
-        const rides = await Ride.find( {user: user._id} )
+        const ride = await Ride.findById( rideId )
             .select(
                 "pickup dropoff reroute price paymentType passenger rideType rideStatus driver createdAt"
             )
-            .skip( skip )
-            .limit( pageSize )
-            .sort( {createdAt: "desc"} )
 
-        const totalCount = await Ride.countDocuments( {user: user._id} )
+        if ( !ride ) return res.status( 404 ).json( {error: "Ride not found"} )
 
-        if ( rides.length === 0 ) {
-            if ( skip === 0 ) {
-                return res.status( 404 ).json( {error: "No rides available. Book now"} )
-            } else {
-                return res.status( 200 ).json( {rides: [], totalCount} )
-            }
-        }
-
-        return res.status( 200 ).json( {rides, totalCount} )
+        return res.status( 200 ).json( {ride} )
     } catch ( error ) {
         console.error( "Error in getUserRidesController:", error )
         return res.status( 500 ).json( {error: "Internal server error"} )
