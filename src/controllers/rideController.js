@@ -18,14 +18,17 @@ webpush.setVapidDetails(
 )
 
 const sendNotification = async ( subscription, data ) => {
-    console.log( data )
-    console.log( subscription )
     try {
-
         const ntf = await webpush.sendNotification( subscription, JSON.stringify( data ) )
-        console.log( "Notification sent", ntf )
+        console.log( ntf )
     } catch ( error ) {
-        console.log( error )
+        if ( error.statusCode === 410 ) {
+            console.error( 'Subscription has expired or is no longer valid:', error.endpoint )
+            await Subscription.deleteOne( {endpoint: error.endpoint} )
+            console.log( 'Deleted expired subscription from database.' )
+        } else {
+            console.error( 'Error sending notification', error )
+        }
     }
 }
 
@@ -97,7 +100,7 @@ const bookRideController = async ( req, res ) => {
             status: availableDriver?.status,
         } )
 
-        const subscription = await Subscription.findOne( {driverId: availableDriver._id} ).select( "-driverId" )
+        const subscription = await Subscription.findOne( {driverId: availableDriver._id} )
 
         if ( subscription ) {
             const notificationPayload = {
@@ -125,16 +128,32 @@ const bookRideController = async ( req, res ) => {
 
 const getUserRidesController = async ( req, res ) => {
     try {
-        const {rideId} = req.params
+        const {user} = req
 
-        const ride = await Ride.findById( rideId )
+        const page = parseInt( req.query.page ) || 1
+        const pageSize = parseInt( req.query.pageSize ) || 10
+
+        const skip = ( page - 1 ) * pageSize
+
+        const rides = await Ride.find( {user: user._id} )
             .select(
                 "pickup dropoff reroute price paymentType passenger rideType rideStatus driver createdAt"
             )
+            .skip( skip )
+            .limit( pageSize )
+            .sort( {createdAt: "desc"} )
 
-        if ( !ride ) return res.status( 404 ).json( {error: "Ride not found"} )
+        const totalCount = await Ride.countDocuments( {user: user._id} )
 
-        return res.status( 200 ).json( {ride} )
+        if ( rides.length === 0 ) {
+            if ( skip === 0 ) {
+                return res.status( 404 ).json( {error: "No rides available. Book now"} )
+            } else {
+                return res.status( 200 ).json( {rides: [], totalCount} )
+            }
+        }
+
+        return res.status( 200 ).json( {rides, totalCount} )
     } catch ( error ) {
         console.error( "Error in getUserRidesController:", error )
         return res.status( 500 ).json( {error: "Internal server error"} )

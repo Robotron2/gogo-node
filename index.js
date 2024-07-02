@@ -4,7 +4,7 @@ const cookieParser = require( "cookie-parser" )
 const cors = require( "cors" )
 const connectToDB = require( "./src/config/db" )
 const {app, server} = require( "./src/socket/socket" )
-const cronJobs = require( "./cronJob" )
+// const cronJobs = require( "./cronJob" )
 const port = process.env.PORT || 4000
 
 const routes = require( "./src/routes" )
