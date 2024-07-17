@@ -110,7 +110,8 @@ const bookRideController = async ( req, res ) => {
                     rideId: newRide._id,
                     pickup: pickupLocation.name,
                     dropoff: dropoffLocation.name,
-                    price: totalPrice.toString(),
+                    // price: `${ totalPrice.toString() },`
+                    price: `₦${ totalPrice.toString() },`
                 }
             }
             await sendNotification( subscription, notificationPayload )
