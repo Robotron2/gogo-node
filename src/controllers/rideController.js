@@ -18,14 +18,17 @@ webpush.setVapidDetails(
 )
 
 const sendNotification = async ( subscription, data ) => {
-    console.log( data )
-    console.log( subscription )
     try {
-
         const ntf = await webpush.sendNotification( subscription, JSON.stringify( data ) )
-        console.log( "Notification sent", ntf )
+        console.log( ntf )
     } catch ( error ) {
-        console.log( error )
+        if ( error.statusCode === 410 ) {
+            console.error( 'Subscription has expired or is no longer valid:', error.endpoint )
+            await Subscription.deleteOne( {endpoint: error.endpoint} )
+            console.log( 'Deleted expired subscription from database.' )
+        } else {
+            console.error( 'Error sending notification', error )
+        }
     }
 }
 
@@ -97,7 +100,7 @@ const bookRideController = async ( req, res ) => {
             status: availableDriver?.status,
         } )
 
-        const subscription = await Subscription.findOne( {driverId: availableDriver._id} ).select( "-driverId" )
+        const subscription = await Subscription.findOne( {driverId: availableDriver._id} )
 
         if ( subscription ) {
             const notificationPayload = {
@@ -107,7 +110,8 @@ const bookRideController = async ( req, res ) => {
                     rideId: newRide._id,
                     pickup: pickupLocation.name,
                     dropoff: dropoffLocation.name,
-                    price: totalPrice.toString(),
+                    // price: `${ totalPrice.toString() },`
+                    price: `₦${ totalPrice.toString() },`
                 }
             }
             await sendNotification( subscription, notificationPayload )
