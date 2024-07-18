@@ -8,34 +8,22 @@ const Location = models.Location
 const Pricing = models.Pricing
 const Subscription = models.DriverSubSchema
 const {io} = require( "../socket/socket" )
-const webpush = require( "web-push" )
+const sendNotification = require( "../utils/sendPushNotification" )
+const EmailService = require( "../utils/emailSender" )
 
-
-webpush.setVapidDetails(
-    'mailto:greyhat320@gmail.com',
-    process.env.PUBLIC_VAPID_KEY,
-    process.env.PRIVATE_VAPID_KEY
-)
-
-const sendNotification = async ( subscription, data ) => {
-    try {
-        const ntf = await webpush.sendNotification( subscription, JSON.stringify( data ) )
-        console.log( ntf )
-    } catch ( error ) {
-        if ( error.statusCode === 410 ) {
-            console.error( 'Subscription has expired or is no longer valid:', error.endpoint )
-            await Subscription.deleteOne( {endpoint: error.endpoint} )
-            console.log( 'Deleted expired subscription from database.' )
-        } else {
-            console.error( 'Error sending notification', error )
-        }
-    }
-}
 
 const bookRideController = async ( req, res ) => {
     const {pickupArea, dropoffArea, passengers, reroute, paymentType, rideType} = req.body
     const {user} = req
 
+    let availableDriver = await Driver.findOne( {
+        isInterstateEnabled: rideType === "interstate",
+        status: "active",
+        hasCar: true,
+        online: true,
+        isSuspended: false
+    } )
+    let rideID
     try {
         if ( !isValidObjectId( pickupArea ) || !isValidObjectId( dropoffArea ) ) {
             return res.status( 400 ).json( {error: "Please provide valid pickup and drop-off locations"} )
@@ -44,13 +32,6 @@ const bookRideController = async ( req, res ) => {
         if ( pickupArea === dropoffArea ) {
             return res.status( 400 ).json( {error: "Pickup area and dropoff area cannot be the same."} )
         }
-
-        let availableDriver = await Driver.findOne( {
-            isInterstateEnabled: rideType === "interstate",
-            status: "active",
-            hasCar: true,
-            online: true,
-        } )
 
         if ( !availableDriver ) {
             return res.status( 404 ).json( {error: `No available drivers for this ${ rideType } ride type`} )
@@ -63,9 +44,7 @@ const bookRideController = async ( req, res ) => {
             ],
         } )
 
-        if ( !pricing ||
-            ( rideType === "interstate" && pricing.interstatePrice === 0 ) ||
-            ( rideType === "intrastate" && pricing.intrastatePrice === 0 ) ) {
+        if ( !pricing || ( rideType === "interstate" && pricing.interstatePrice === 0 ) || ( rideType === "intrastate" && pricing.intrastatePrice === 0 ) ) {
             return res.status( 404 ).json( {error: "No pricing available for this ride"} )
         }
 
@@ -92,6 +71,7 @@ const bookRideController = async ( req, res ) => {
         } )
 
         await newRide.save()
+        rideID = newRide._id
         availableDriver.status = "driving"
         await availableDriver.save()
 
@@ -110,7 +90,6 @@ const bookRideController = async ( req, res ) => {
                     rideId: newRide._id,
                     pickup: pickupLocation.name,
                     dropoff: dropoffLocation.name,
-                    // price: `${ totalPrice.toString() },`
                     price: `₦${ totalPrice.toString() },`
                 }
             }
@@ -119,12 +98,32 @@ const bookRideController = async ( req, res ) => {
             console.log( `No subscription found for driver ${ availableDriver._id }` )
         }
 
+        // Send email to the driver
+        const transporter = EmailService.createTransporter()
+        try {
+            await EmailService.sendRideBookedMail( transporter, {pickupLocation, dropoffLocation, passengers, totalPrice, driverName: availableDriver?.fullname, email: availableDriver?.email} )
+        } catch ( error ) {
+            console.log( "Error sending booking email to driver" )
+        }
+
         res.status( 201 ).json( newRide )
     } catch ( error ) {
         console.error( 'Error booking ride:', error )
+        availableDriver.status = "active"
+
+        await Promise.all( [
+            availableDriver.save(),
+            Ride.findByIdAndDelete( rideID )
+
+        ] )
+        io.to( availableDriver.socketId ).emit( "rideBooked", {
+            ride: null,
+            status: "active",
+        } )
         res.status( 500 ).json( {error: "Failed to book the ride", message: error.message} )
     }
 }
+
 
 
 const getUserRidesController = async ( req, res ) => {
